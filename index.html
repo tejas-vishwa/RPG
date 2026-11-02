@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Password Generator</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%3E<text y=%2226%22 font-size=%2224%22>🔐</text></svg>">
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --success-color: #059669;
+      --success-hover: #047857;
+      --clear-btn-bg: #f1f5f9;
+      --clear-btn-hover: #e2e8f0;
+      --clear-btn-fg: #475569;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .app-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      width: 100%;
+      max-width: 620px;
+      padding: 2.25rem 2.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .length-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .length-group label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .length-input {
+      width: 80px;
+      padding: 0.45rem 0.6rem;
+      font-size: 1rem;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: #ffffff;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .length-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .length-hint {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .options-fieldset {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.9rem 1.25rem 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .options-fieldset legend {
+      padding: 0 0.5rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .output-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .output-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+
+    .output-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-align: center;
+      background-color: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #0f172a;
+      letter-spacing: 0.05em;
+      outline: none;
+    }
+
+    .actions-grid {
+      display: flex;
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.15s, transform 0.05s;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
+      color: #ffffff;
+    }
+
+    .btn-success:hover {
+      background-color: var(--success-hover);
+    }
+
+    .btn-clear {
+      background-color: var(--clear-btn-bg);
+      color: var(--clear-btn-fg);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-clear:hover {
+      background-color: var(--clear-btn-hover);
+    }
+
+    .status-bar {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      min-height: 1.2rem;
+    }
+
+    /* Modal / Alert Dialog (matches tkinter.messagebox) */
+    dialog {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      max-width: 420px;
+      width: 90%;
+      background: #ffffff;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      margin: auto;
+    }
+
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+    }
+
+    .dialog-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .dialog-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .dialog-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #b45309;
+    }
+
+    .dialog-body {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .dialog-btn {
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+      padding: 0.45rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      .app-card {
+        padding: 1.5rem 1.25rem;
+      }
+      .actions-grid {
+        flex-direction: column;
+      }
+      .checkbox-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="app-card">
+    <header>
+      <h1>Random Password Generator</h1>
+      <p class="subtitle">Create a strong password in a few simple steps</p>
+    </header>
+
+    <div class="form-group length-group">
+      <label for="length-input">Password Length:</label>
+      <input type="number" id="length-input" class="length-input" value="12" min="4" max="128">
+      <span class="length-hint">(Minimum 4 characters, 12+ recommended)</span>
+    </div>
+
+    <fieldset class="options-fieldset">
+      <legend> Character Options </legend>
+      <div class="checkbox-grid">
+        <label class="checkbox-item">
+          <input type="checkbox" id="check-upper" checked>
+          <span>Uppercase letters (A-Z)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="check-lower" checked>
+          <span>Lowercase letters (a-z)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="check-digits" checked>
+          <span>Numbers (0-9)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="check-symbols" checked>
+          <span>Special symbols (!, @, #, ...)</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="output-section">
+      <label class="output-label" for="output-password">Generated Password:</label>
+      <input type="text" id="output-password" class="output-input" readonly placeholder="Click GENERATE PASSWORD below">
+    </div>
+
+    <div class="actions-grid">
+      <button type="button" id="btn-generate" class="btn btn-primary">GENERATE PASSWORD</button>
+      <button type="button" id="btn-copy" class="btn btn-success">COPY PASSWORD</button>
+      <button type="button" id="btn-clear" class="btn btn-clear">CLEAR</button>
+    </div>
+
+    <div id="status-bar" class="status-bar">Ready.</div>
+  </main>
+
+  <!-- Warning Dialog Modal -->
+  <dialog id="alert-modal">
+    <div class="dialog-header">
+      <span class="dialog-icon">⚠️</span>
+      <h2 id="modal-title" class="dialog-title">Warning</h2>
+    </div>
+    <p id="modal-message" class="dialog-body"></p>
+    <div class="dialog-footer">
+      <button type="button" id="modal-close" class="dialog-btn">OK</button>
+    </div>
+  </dialog>
+
+  <script>
+    // Character pools equivalent to Python's string constants
+    const POOLS = {
+      upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      lower: "abcdefghijklmnopqrstuvwxyz",
+      digits: "0123456789",
+      symbols: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+    };
+
+    // DOM Elements
+    const lengthInput = document.getElementById("length-input");
+    const checkUpper = document.getElementById("check-upper");
+    const checkLower = document.getElementById("check-lower");
+    const checkDigits = document.getElementById("check-digits");
+    const checkSymbols = document.getElementById("check-symbols");
+    const outputPassword = document.getElementById("output-password");
+    const btnGenerate = document.getElementById("btn-generate");
+    const btnCopy = document.getElementById("btn-copy");
+    const btnClear = document.getElementById("btn-clear");
+    const statusBar = document.getElementById("status-bar");
+
+    // Modal Elements
+    const alertModal = document.getElementById("alert-modal");
+    const modalTitle = document.getElementById("modal-title");
+    const modalMessage = document.getElementById("modal-message");
+    const modalClose = document.getElementById("modal-close");
+
+    function showWarning(title, message) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      if (typeof alertModal.showModal === "function") {
+        alertModal.showModal();
+      } else {
+        alert(`${title}: ${message}`);
+      }
+    }
+
+    modalClose.addEventListener("click", () => {
+      alertModal.close();
+    });
+
+    /**
+     * Cryptographically secure random integer in [0, max - 1]
+     * using Web Crypto API (crypto.getRandomValues).
+     */
+    function secureRandomInt(max) {
+      if (max <= 0) return 0;
+      const array = new Uint32Array(1);
+      const limit = Math.floor(0x100000000 / max) * max;
+      while (true) {
+        window.crypto.getRandomValues(array);
+        if (array[0] < limit) {
+          return array[0] % max;
+        }
+      }
+    }
+
+    /**
+     * Cryptographically secure Fisher-Yates array shuffle.
+     */
+    function secureShuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = secureRandomInt(i + 1);
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+      return array;
+    }
+
+    function generatePassword() {
+      const rawLength = lengthInput.value.trim();
+
+      // Validation 1: whole number
+      const length = Number(rawLength);
+      if (!Number.isInteger(length) || rawLength === "" || isNaN(length)) {
+        showWarning("Invalid Input", "Please enter a valid whole number for the password length.");
+        statusBar.textContent = "Error: Invalid length input.";
+        return;
+      }
+
+      // Validation 2: length < 4
+      if (length < 4) {
+        showWarning("Length Too Short", "Password length must be at least 4 characters.");
+        statusBar.textContent = "Error: Length must be at least 4.";
+        return;
+      }
+
+      // Collect enabled categories
+      const activeCategories = [];
+      if (checkUpper.checked) activeCategories.push(POOLS.upper);
+      if (checkLower.checked) activeCategories.push(POOLS.lower);
+      if (checkDigits.checked) activeCategories.push(POOLS.digits);
+      if (checkSymbols.checked) activeCategories.push(POOLS.symbols);
+
+      // Validation 3: no categories selected
+      if (activeCategories.length === 0) {
+        showWarning("No Options Selected", "Please select at least one character category.");
+        statusBar.textContent = "Error: No character options selected.";
+        return;
+      }
+
+      // Validation 4: length < selected categories count
+      if (length < activeCategories.length) {
+        showWarning(
+          "Length Conflict",
+          `Password length (${length}) cannot be shorter than the number of selected categories (${activeCategories.length}).`
+        );
+        statusBar.textContent = "Error: Length shorter than selected categories.";
+        return;
+      }
+
+      // Guaranteed character from each enabled category
+      const passwordChars = [];
+      for (const pool of activeCategories) {
+        const idx = secureRandomInt(pool.length);
+        passwordChars.push(pool[idx]);
+      }
+
+      // Combined pool for remaining characters
+      const combinedPool = activeCategories.join("");
+      const remainingCount = length - passwordChars.length;
+      for (let i = 0; i < remainingCount; i++) {
+        const idx = secureRandomInt(combinedPool.length);
+        passwordChars.push(combinedPool[idx]);
+      }
+
+      // Secure in-place shuffle
+      secureShuffle(passwordChars);
+
+      outputPassword.value = passwordChars.join("");
+      statusBar.textContent = "Password generated successfully!";
+    }
+
+    async function copyPassword() {
+      const password = outputPassword.value;
+      if (!password) {
+        showWarning("No Password", "No password has been generated yet to copy.");
+        statusBar.textContent = "Warning: Nothing to copy.";
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(password);
+        } else {
+          outputPassword.select();
+          document.execCommand("copy");
+        }
+        statusBar.textContent = "Password copied to clipboard!";
+      } catch (err) {
+        outputPassword.select();
+        document.execCommand("copy");
+        statusBar.textContent = "Password copied to clipboard!";
+      }
+    }
+
+    function clearApp() {
+      lengthInput.value = "12";
+      outputPassword.value = "";
+      statusBar.textContent = "Ready.";
+    }
+
+    btnGenerate.addEventListener("click", generatePassword);
+    btnCopy.addEventListener("click", copyPassword);
+    btnClear.addEventListener("click", clearApp);
+
+    // Allow Enter key in length input to trigger generation
+    lengthInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        generatePassword();
+      }
+    });
+  </script>
+</body>
+</html>
